@@ -1,0 +1,101 @@
+@@ -0,0 +1,100 @@
+--- a/chrome/browser/BUILD.gn
++++ b/chrome/browser/BUILD.gn
+@@ -1884,6 +1884,7 @@ static_library("browser") {
+     "//components/content_settings/core/browser",
+     "//components/content_settings/core/browser:cookie_settings",
+     "//components/content_settings/core/common",
++    "//components/containers",
+     "//components/contextual_search:impl",
+     "//components/contextual_search:policy_handler",
+     "//components/contextual_search:prefs",
+--- a/chrome/browser/DEPS
++++ b/chrome/browser/DEPS
+@@ -102,6 +102,7 @@ include_rules = [
+   "+components/component_updater",
+   "+components/component_updater/installer_policies",
+   "+components/compose",
++  "+components/containers",
+   "+components/consent_auditor",
+   "+components/constrained_window",
+   "+components/content_capture/browser",
+--- a/chrome/browser/about_flags.cc
++++ b/chrome/browser/about_flags.cc
+@@ -100,6 +100,7 @@
+ #include "components/component_updater/component_updater_switches.h"
+ #include "components/compose/buildflags.h"
+ #include "components/compose/core/browser/compose_features.h"
++#include "components/containers/features.h"
+ #include "components/content_settings/core/common/features.h"
+ #include "components/contextual_tasks/public/features.h"
+ #include "components/data_sharing/public/features.h"
+--- a/chrome/browser/helium_flag_choices.h
++++ b/chrome/browser/helium_flag_choices.h
+@@ -37,6 +37,8 @@ namespace helium {
+   constexpr const char kHeliumNoiseCpuCoresCommandLine[] =
+       "helium-noise-hw-concurrency";
+ 
++  constexpr const char kHeliumContainersCommandLine[] = "helium-containers";
++
+   constexpr const char kMiddleClickAutoscrollCommandLine[] = "middle-click-autoscroll";
+   constexpr const char kHeliumCompactLocationWidthCommandLine[] =
+       "helium-compact-location-width";
+--- a/chrome/browser/helium_flag_entries.h
++++ b/chrome/browser/helium_flag_entries.h
+@@ -36,6 +36,10 @@
+      "Randomizes the number of cores returned by "
+      "`navigator.hardwareConcurrency` in a reasonable range. Helium flag.",
+      kOsAll, FEATURE_VALUE_TYPE(blink::features::kHeliumNoiseCpuCores)},
++    {helium::kHeliumContainersCommandLine,
++     "Enable Containers",
++     "Allows websites to be opened in contained tabs, keeping different identities separate within the same browser profile. Helium flag.",
++     kOsDesktop, FEATURE_VALUE_TYPE(containers::features::kHeliumContainers)},
+     {helium::kMiddleClickAutoscrollCommandLine,
+      "Middle Click Autoscroll",
+      "Enables autoscroll on middle click. Helium flag, Chromium feature.",
+--- /dev/null
++++ b/components/containers/BUILD.gn
+@@ -0,0 +1,15 @@
++component("features") {
++    output_name = "containers_features"
++    defines = [ "IS_CONTAINERS_FEATURES_IMPL" ]
++
++    sources = [
++        "features.cc",
++        "features.h",
++    ]
++
++    deps = [ "//base" ]
++}
++
++group("containers") {
++    public_deps = [ ":features" ]
++}
+--- /dev/null
++++ b/components/containers/features.h
+@@ -0,0 +1,13 @@
++#ifndef COMPONENTS_CONTAINERS_CORE_COMMON_FEATURES_H_
++#define COMPONENTS_CONTAINERS_CORE_COMMON_FEATURES_H_
++
++#include "base/component_export.h"
++#include "base/feature_list.h"
++
++namespace containers::features {
++
++COMPONENT_EXPORT(CONTAINERS_FEATURES) BASE_DECLARE_FEATURE(kHeliumContainers);
++
++} // namespace containers::features
++
++#endif  // COMPONENTS_CONTAINERS_CORE_COMMON_FEATURES_H_
+--- /dev/null
++++ b/components/containers/features.cc
+@@ -0,0 +1,9 @@
++#include "components/containers/features.h"
++
++namespace containers::features {
++
++BASE_FEATURE(kHeliumContainers,
++             "HeliumContainers",
++             base::FEATURE_DISABLED_BY_DEFAULT);
++
++} // namespace containers::features
