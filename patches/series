@@ -311,3 +311,4 @@ helium/ui/experiments/zen-caption-buttons.patch
 helium/ui/experiments/zen-mode.patch
 
 helium/containers/add-containers-flag.patch
+helium/containers/add-containers-settings.patch
